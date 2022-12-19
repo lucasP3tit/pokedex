@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <div class="column is-half is-offset-one-quarter">
-      <div v-for="(pokemon, index) in pokemons" :key="index">
+      POKEDEX<br>
+      <input class="input is-rounded" type="text" placeholder="buscar pokemon pelo nome" v-model="pokemonSearch">
+      <button id="btn-search" class="button is-medium is-responsive is-primary is-rounded" @click="findPokemon">Buscar</button>
+      <div class="poke" v-for="(pokemon, index) in filteredPokemons" :key="pokemon.url">
       <Pokemon :name = "pokemon.name" :url= "pokemon.url" :num ="index+1" />
     </div>
     </div>
@@ -14,9 +17,6 @@
 import axios from 'axios';
 import Pokemon from './components/Poke-Mon.vue';
 
-
-
-
 export default {
   name: 'App',
 
@@ -27,7 +27,9 @@ export default {
 
   data(){
     return{
-      pokemons : []
+      pokemons : [],
+      pokemonSearch:'',
+      filteredPokemons:[]
     }
     
   },
@@ -40,7 +42,16 @@ export default {
     fetchPokemons(){
       axios.get("https://pokeapi.co/api/v2/pokemon?limit=150&offset=0").then(resp =>{
         this.pokemons = resp.data.results;
+        this.filteredPokemons = resp.data.results;
       }).catch(err=>console.log(err))
+    },
+
+    findPokemon(){
+      let busca = this.pokemonSearch.toLowerCase();
+      if(this.pokemonSearch === '' || this.pokemonSearch === ' '){
+        return this.filteredPokemons = this.pokemons;
+      }
+      return this.filteredPokemons = this.pokemons.filter(pokemon => pokemon.name === busca);
     }
 
   },
@@ -56,5 +67,13 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.poke{
+  margin-top:2%;
+}
+
+#btn-search{
+  margin-top:2%;
+  width:100%;
 }
 </style>
